@@ -1,0 +1,661 @@
+repeat task.wait() until game:IsLoaded()
+
+local UI = loadstring(game:HttpGet("https://xan.bar/init.lua"))()
+
+local Window = UI.New({
+Title = "AZRAZURE EXPLOITS",
+Theme = "Forest",
+Size = UDim2.new(0, 450, 0, 300),
+ShowUserInfo = true,
+ShowActiveList = true
+})
+
+local boostCashEnabled=false
+local boostCoinEnabled=false
+local autoExpEnabled=false
+local hideIdentityEnabled=false
+local autoKmEnabled=false
+local autoTakeEnabled=false
+local autoSukleEnabled=false
+local dragRaceBoostEnabled=false
+local noCDSendCashEnabled=false
+local sendCashGUICreated=false
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local function clickButton(btn)
+    if getconnections then
+        for _, conn in pairs(getconnections(btn.MouseButton1Click)) do
+            conn:Fire()
+        end
+        for _, conn in pairs(getconnections(btn.Activated)) do
+            conn:Fire()
+        end
+    end
+end
+
+local function clickAllTake()
+    for _, obj in pairs(playerGui:GetDescendants()) do
+        if (obj:IsA("TextButton") or obj:IsA("ImageButton")) 
+            and obj.Name == "Take"
+            and obj.Visible 
+            and obj.Active 
+            and obj.Parent then
+            clickButton(obj)
+        end
+    end
+end
+
+local function clickFiftyButton()
+    for _, obj in pairs(playerGui:GetDescendants()) do
+        if (obj:IsA("TextButton") or obj:IsA("ImageButton")) 
+            and obj.Name == "50"
+            and obj.Visible 
+            and obj.Active 
+            and obj.Parent then
+            clickButton(obj)
+        end
+    end
+end
+
+local function clickAllGive()
+    for _, obj in pairs(playerGui:GetDescendants()) do
+        if (obj:IsA("TextButton") or obj:IsA("ImageButton")) 
+            and obj.Name == "Give"
+            and obj.Visible 
+            and obj.Active 
+            and obj.Parent then
+            clickButton(obj)
+        end
+    end
+end
+
+local function createNoCDSendCashGUI()
+    if sendCashGUICreated then return end
+    sendCashGUICreated = true
+
+    local r = game:GetService("ReplicatedStorage"):WaitForChild("Remotes", 9e9)
+    local Multiplier = 150
+    local Running = false
+    local SelectedPlayer = nil
+    local Threads = {}
+
+    local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+    ScreenGui.Name = "SendCashGUI"
+    ScreenGui.ResetOnSpawn = false
+
+    local Main = Instance.new("Frame", ScreenGui)
+    Main.Size = UDim2.new(0, 200, 0, 260)
+    Main.Position = UDim2.new(0.5, -100, 0.5, -130)
+    Main.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Main.BorderSizePixel = 0
+    Main.Active = true
+    Main.Draggable = true
+
+    Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
+    local Stroke = Instance.new("UIStroke", Main)
+    Stroke.Color = Color3.fromRGB(0, 0, 0)
+    Stroke.Thickness = 2
+
+    local Title = Instance.new("TextLabel", Main)
+    Title.Size = UDim2.new(1, 0, 0, 30)
+    Title.BackgroundTransparency = 1
+    Title.Text = "AUTO SEND"
+    Title.Font = Enum.Font.GothamBold
+    Title.TextSize = 14
+    Title.TextColor3 = Color3.fromRGB(0, 0, 0)
+
+    local ListFrame = Instance.new("ScrollingFrame", Main)
+    ListFrame.Size = UDim2.new(0.9, 0, 0.6, 0)
+    ListFrame.Position = UDim2.new(0.05, 0, 0.15, 0)
+    ListFrame.BackgroundTransparency = 1
+    ListFrame.BorderSizePixel = 0
+    ListFrame.ScrollBarThickness = 0
+    ListFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+
+    local Layout = Instance.new("UIListLayout", ListFrame)
+    Layout.Padding = UDim.new(0, 4)
+
+    local StartBtn = Instance.new("TextButton", Main)
+    StartBtn.Size = UDim2.new(0.9, 0, 0, 35)
+    StartBtn.Position = UDim2.new(0.05, 0, 0.82, 0)
+    StartBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    StartBtn.Text = "START"
+    StartBtn.Font = Enum.Font.GothamBold
+    StartBtn.TextSize = 13
+    StartBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Instance.new("UICorner", StartBtn).CornerRadius = UDim.new(0, 6)
+
+    local function Refresh()
+        for _, v in ipairs(ListFrame:GetChildren()) do
+            if v:IsA("TextButton") then v:Destroy() end
+        end
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr ~= Players.LocalPlayer then
+                local b = Instance.new("TextButton", ListFrame)
+                b.Size = UDim2.new(1, 0, 0, 28)
+                b.BackgroundColor3 = Color3.fromRGB(245, 245, 245)
+                b.Text = plr.Name
+                b.Font = Enum.Font.Gotham
+                b.TextSize = 11
+                b.TextColor3 = Color3.fromRGB(0, 0, 0)
+                Instance.new("UICorner", b).CornerRadius = UDim.new(0, 4)
+                local s = Instance.new("UIStroke", b)
+                s.Color = Color3.fromRGB(220, 220, 220)
+
+                b.MouseButton1Click:Connect(function()
+                    SelectedPlayer = plr.Name
+                    for _, x in ipairs(ListFrame:GetChildren()) do
+                        if x:IsA("TextButton") then
+                            x.BackgroundColor3 = Color3.fromRGB(245, 245, 245)
+                            x.UIStroke.Color = Color3.fromRGB(220, 220, 220)
+                        end
+                    end
+                    b.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
+                    s.Color = Color3.fromRGB(0, 0, 0)
+                end)
+            end
+        end
+        ListFrame.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y)
+    end
+
+    local function Toggle()
+        if Running then
+            Running = false
+            Threads = {}
+            StartBtn.Text = "START"
+            StartBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        else
+            if not SelectedPlayer then return end
+            Running = true
+            StartBtn.Text = "STOP"
+            StartBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+            for i = 1, Multiplier do
+                local t = task.spawn(function()
+                    while Running do
+                        pcall(function()
+                            local target = Players:FindFirstChild(SelectedPlayer)
+                            if target then
+                                local data = {["Value"] = 50000, ["OtherPlayer"] = target, ["Password"] = 711120457}
+                                r.SendCash:InvokeServer(data)
+                                r.CheckCash:InvokeServer(data)
+                            end
+                        end)
+                        task.wait(0.05)
+                    end
+                end)
+                table.insert(Threads, t)
+            end
+        end
+    end
+
+    StartBtn.MouseButton1Click:Connect(Toggle)
+    Players.PlayerAdded:Connect(Refresh)
+    Players.PlayerRemoving:Connect(Refresh)
+    Refresh()
+end
+
+local Home = Window:AddTab("Home")
+
+Home:AddSection("Home Features")
+
+Home:AddToggle("Boost Cash", {Default=false}, function(state)
+boostCashEnabled=state
+if state then
+local RecieveCash=game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RecieveCash")
+task.spawn(function()
+while boostCashEnabled do
+for i=1,3500 do
+if not boostCashEnabled then break end
+pcall(function()
+RecieveCash:FireServer({Value=100,Password=93828272827})
+end)
+end
+task.wait(0.25)
+end
+end)
+end
+end)
+
+Home:AddToggle("Boost Coin", {Default=false}, function(state)
+boostCoinEnabled=state
+if state then
+local ReplicatedStorage=game:GetService("ReplicatedStorage")
+local Workspace=game:GetService("Workspace")
+local Players=game:GetService("Players")
+local RecieveCoin=ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RecieveCoin")
+local PlayerName=Players.LocalPlayer.Name
+local JeepFolder=Workspace:WaitForChild("Jeepnies"):WaitForChild(PlayerName)
+local PassengerValues=JeepFolder:WaitForChild("PassengerValues")
+task.spawn(function()
+while boostCoinEnabled do
+pcall(function()
+RecieveCoin:FireServer({Value=300,PassengerValues=PassengerValues,Password=308383873})
+end)
+task.wait(0.01)
+end
+end)
+end
+end)
+
+local function autoFarmKm(state)
+local player = game.Players.LocalPlayer
+if state then
+spawn(function()
+while state and player.Character and player.Character:FindFirstChild("HumanoidRootPart") do
+local hum = player.Character:FindFirstChild("Humanoid")
+if hum and hum.SeatPart then
+local car = hum.SeatPart.Parent
+if car.Body:FindFirstChild("#Weight") then
+car.PrimaryPart = car.Body["#Weight"]
+end
+local location1 = Vector3.new(-6205.2983, 100, 8219.8535)
+local location2 = Vector3.new(-7594.5410, 100, 5130.9526)
+repeat
+task.wait()
+car.PrimaryPart.Velocity = car.PrimaryPart.CFrame.LookVector * 550
+car:PivotTo(CFrame.new(car.PrimaryPart.Position, location1))
+until (player.Character.PrimaryPart.Position - location1).Magnitude < 50 or not state
+car.PrimaryPart.Velocity = Vector3.new(0,0,0)
+repeat
+task.wait()
+car.PrimaryPart.Velocity = car.PrimaryPart.CFrame.LookVector * 550
+car:PivotTo(CFrame.new(car.PrimaryPart.Position, location2))
+until (player.Character.PrimaryPart.Position - location2).Magnitude < 50 or not state
+car.PrimaryPart.Velocity = Vector3.new(0,0,0)
+end
+task.wait(0.1)
+end
+end)
+end
+end
+
+Home:AddToggle("Auto KM Farm", {Default=false}, function(state)
+autoKmEnabled = state
+autoFarmKm(autoKmEnabled)
+end)
+
+Home:AddToggle("Auto Take", {Default=false}, function(state)
+autoTakeEnabled=state
+if state then
+task.spawn(function()
+while autoTakeEnabled do
+pcall(function()
+clickAllTake()
+end)
+task.wait(0.1)
+end
+end)
+end
+end)
+
+Home:AddToggle("Auto Sukle", {Default=false}, function(state)
+autoSukleEnabled=state
+if state then
+task.spawn(function()
+while autoSukleEnabled do
+pcall(function()
+clickAllTake()
+task.wait(0.1)
+for i = 1, 4 do
+clickFiftyButton()
+task.wait(0.01)
+end
+task.wait(0.1)
+clickAllGive()
+end)
+task.wait(0.1)
+end
+end)
+end
+end)
+
+Home:AddToggle("No CD Send Cash", {Default=false}, function(state)
+noCDSendCashEnabled=state
+if state then
+createNoCDSendCashGUI()
+else
+sendCashGUICreated = false
+local CoreGui = game:GetService("CoreGui")
+if CoreGui:FindFirstChild("SendCashGUI") then
+CoreGui:FindFirstChild("SendCashGUI"):Destroy()
+end
+end
+end)
+
+local FarmEXP = Window:AddTab("Farm EXP")
+
+FarmEXP:AddSection("EXP Farming")
+
+FarmEXP:AddToggle("Auto Farm EXP", {Default=false}, function(state)
+autoExpEnabled=state
+end)
+
+local mt=getrawmetatable(game)
+local old=mt.__namecall
+setreadonly(mt,false)
+mt.__namecall=function(remote,...)
+local args={...}
+local method=getnamecallmethod()
+if (method=="FireServer" or method=="InvokeServer") and remote.Name=="UnloadPassenger" then
+if autoExpEnabled then
+for i=1,5500 do
+old(remote,unpack(args))
+end
+end
+end
+return old(remote,...)
+end
+setreadonly(mt,true)
+
+local function safeTeleport(pos)
+local player=game.Players.LocalPlayer
+local char=player.Character
+if not char then return end
+local hrp=char:FindFirstChild("HumanoidRootPart")
+local humanoid=char:FindFirstChildOfClass("Humanoid")
+if not hrp or not humanoid then return end
+local seat=humanoid.SeatPart
+if seat then
+local jeepFolder=workspace:FindFirstChild("Jeepnies")
+if jeepFolder then
+local jeep=jeepFolder:FindFirstChild(player.Name)
+if jeep and jeep:IsA("Model") then
+for _,part in ipairs(jeep:GetDescendants()) do
+if part:IsA("BasePart") then
+part.AssemblyLinearVelocity=Vector3.zero
+part.AssemblyAngularVelocity=Vector3.zero
+end
+end
+task.wait(0.05)
+jeep:PivotTo(CFrame.new(pos))
+return
+end
+end
+end
+hrp.CFrame=CFrame.new(pos)
+end
+
+FarmEXP:AddSection("Teleports")
+
+FarmEXP:AddButton("TP Guiguinto Terminal", function()
+safeTeleport(Vector3.new(1060,16,3167))
+end)
+
+FarmEXP:AddButton("TP Bulakan Terminal", function()
+safeTeleport(Vector3.new(-626,16,-3202))
+end)
+
+FarmEXP:AddButton("TP Bulakan DropOff", function()
+safeTeleport(Vector3.new(-1545,13,-3470))
+end)
+
+FarmEXP:AddButton("TP Balagtas Terminal", function()
+safeTeleport(Vector3.new(-3922,17,3156))
+end)
+
+FarmEXP:AddButton("TP Balagtas DropOff", function()
+safeTeleport(Vector3.new(-3812.233,9.77,3343.39))
+end)
+
+local Misc = Window:AddTab("Misc")
+
+Misc:AddSection("Misc Features")
+
+Misc:AddToggle("Hide Identity", {Default=false}, function(state)
+hideIdentityEnabled=state
+local lp = game:GetService("Players").LocalPlayer
+local rs = game:GetService("RunService")
+local hud = lp.PlayerGui:WaitForChild("Screen"):WaitForChild("Labels"):WaitForChild("HungerLabels")
+for _, v in pairs(hud:GetChildren()) do
+v:Destroy()
+end
+if state then
+if hud:IsA("GuiObject") then
+hud.BackgroundTransparency = 1
+hud.BorderSizePixel = 0
+end
+local main = Instance.new("Frame", hud)
+main.Name = "Main"
+main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+main.BackgroundTransparency = 0.4
+main.Size = UDim2.new(0, 240, 0, 50)
+main.Position = UDim2.new(0, 0, 0, -15)
+main.BorderSizePixel = 0
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
+local st = Instance.new("UIStroke", main)
+st.Thickness = 2
+st.Color = Color3.new(1, 1, 1)
+local grad = Instance.new("UIGradient", st)
+grad.Color = ColorSequence.new{
+ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
+ColorSequenceKeypoint.new(0.5, Color3.new(0, 0, 0)),
+ColorSequenceKeypoint.new(1, Color3.new(0, 0, 0))
+}
+local r = 0
+rs.RenderStepped:Connect(function(dt)
+if not main or not main.Parent then return end
+r = r + (120 * dt)
+grad.Rotation = r
+end)
+local ico = Instance.new("ImageLabel", main)
+ico.BackgroundTransparency = 1
+ico.Size = UDim2.new(0, 35, 0, 35)
+ico.Position = UDim2.new(0, 8, 0.5, 0)
+ico.AnchorPoint = Vector2.new(0, 0.5)
+ico.Image = ""
+local t1 = Instance.new("TextLabel", main)
+t1.BackgroundTransparency = 1
+t1.Position = UDim2.new(0, 50, 0, 5)
+t1.Size = UDim2.new(1, -55, 0, 20)
+t1.Font = "GothamBlack"
+t1.Text = "AZRAZURE EXPLOITS"
+t1.TextColor3 = Color3.new(1, 1, 1)
+t1.TextSize = 16
+t1.TextXAlignment = "Left"
+local t2 = Instance.new("TextLabel", main)
+t2.BackgroundTransparency = 1
+t2.Position = UDim2.new(0, 50, 0, 22)
+t2.Size = UDim2.new(1, -55, 0, 20)
+t2.Font = "GothamBold"
+t2.Text = "FREE SCRIPTS"
+t2.TextColor3 = Color3.new(1, 1, 1)
+t2.TextSize = 12
+t2.TextXAlignment = "Left"
+else
+for _, v in pairs(hud:GetChildren()) do
+v:Destroy()
+end
+end
+end)
+
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local velocityMult = 0.01572
+local maxSpeed = 220
+local currentSeat = nil
+local gasHeld = false
+local brakeHeld = false
+local gasButton, brakeButton = nil, nil
+local dragRaceConnection = nil
+
+local function setupSeat()
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    humanoid:GetPropertyChangedSignal("SeatPart"):Connect(function()
+        local seat = humanoid.SeatPart
+        if seat and seat:IsA("BasePart") then
+            currentSeat = seat
+        else
+            currentSeat = nil
+        end
+    end)
+    local seat = humanoid.SeatPart
+    if seat and seat:IsA("BasePart") then
+        currentSeat = seat
+    end
+end
+
+setupSeat()
+LocalPlayer.CharacterAdded:Connect(setupSeat)
+
+task.spawn(function()
+    repeat task.wait(0.5) until LocalPlayer:FindFirstChild("PlayerGui")
+    local playerGui = LocalPlayer.PlayerGui
+    local success, buttonsFolder = pcall(function()
+        return playerGui:WaitForChild("A-Chassis Interface"):WaitForChild("Buttons")
+    end)
+    if success and buttonsFolder then
+        gasButton = buttonsFolder:FindFirstChild("Gas")
+        brakeButton = buttonsFolder:FindFirstChild("Brake")
+
+        if gasButton then
+            gasButton.MouseButton1Down:Connect(function() gasHeld = true end)
+            gasButton.MouseButton1Up:Connect(function() gasHeld = false end)
+            gasButton.TouchStarted:Connect(function() gasHeld = true end)
+            gasButton.TouchEnded:Connect(function() gasHeld = false end)
+        end
+
+        if brakeButton then
+            brakeButton.MouseButton1Down:Connect(function() brakeHeld = true end)
+            brakeButton.MouseButton1Up:Connect(function() brakeHeld = false end)
+            brakeButton.TouchStarted:Connect(function() brakeHeld = true end)
+            brakeButton.TouchEnded:Connect(function() brakeHeld = false end)
+        end
+    end
+end)
+
+Misc:AddToggle("Drag Race Speed Boost", {Default=false}, function(state)
+dragRaceBoostEnabled=state
+if state then
+if dragRaceConnection then dragRaceConnection:Disconnect() end
+dragRaceConnection = RunService.Heartbeat:Connect(function(dt)
+    if not dragRaceBoostEnabled or not currentSeat then return end
+    local vel = currentSeat.AssemblyLinearVelocity
+    local speed = vel.Magnitude
+    if gasHeld and not brakeHeld and speed < maxSpeed then
+        local mult = 1 + (velocityMult * (dt * 60))
+        currentSeat.AssemblyLinearVelocity = Vector3.new(vel.X * mult, vel.Y, vel.Z * mult)
+    end
+end)
+else
+if dragRaceConnection then
+dragRaceConnection:Disconnect()
+dragRaceConnection = nil
+end
+end
+end)
+
+Misc:AddButton("ESP Jeep", function()
+local p = game.Players.LocalPlayer
+local folder = workspace:FindFirstChild("Jeepnies")
+local function add_esp(v)
+if not v or v:FindFirstChild("JeepESP") then return end
+local h = Instance.new("Highlight")
+h.Name = "JeepESP"
+h.FillColor = Color3.fromRGB(0, 150, 255)
+h.FillTransparency = 0.5
+h.OutlineTransparency = 0.2
+h.Parent = v
+local gui = Instance.new("BillboardGui", v)
+gui.Name = "JeepName"
+gui.Size = UDim2.new(0, 150, 0, 40)
+gui.StudsOffset = Vector3.new(0, 3, 0)
+gui.AlwaysOnTop = true
+local t = Instance.new("TextLabel", gui)
+t.BackgroundTransparency = 1
+t.Size = UDim2.new(1, 0, 1, 0)
+t.TextColor3 = Color3.new(0, 1, 1)
+t.TextStrokeTransparency = 0
+t.Font = Enum.Font.SourceSansBold
+t.TextScaled = true
+task.spawn(function()
+while v and v.Parent do
+local seat = v:FindFirstChildOfClass("VehicleSeat") or v:FindFirstChild("DriveSeat")
+local name = "Empty"
+if seat and seat.Occupant then
+name = seat.Occupant.Parent.Name
+end
+local d = 0
+if p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+d = (p.Character.HumanoidRootPart.Position - v:GetPivot().Position).Magnitude
+end
+t.Text = "Jeep | " .. name .. " | " .. math.floor(d) .. "s"
+task.wait(0.3)
+end
+end)
+end
+if folder then
+for _, car in pairs(folder:GetChildren()) do
+add_esp(car)
+end
+end
+end)
+
+Misc:AddButton("DELETE NPC CAR", function()
+local folder=workspace:FindFirstChild("AiVehicles")
+if folder then
+for _,v in pairs(folder:GetChildren()) do v:Destroy() end
+end
+end)
+
+local Music = Window:AddTab("Music")
+
+Music:AddSection("Music Player")
+
+local songs={
+{Id=102530888109784,Name="No limit Ice ice"},
+{Id=86793099693274,Name="PUFF ME UP SUPAFLY"},
+{Id=104642889770966,Name="Thug Love"},
+{Id=123193066922226,Name="MYDAY HELLMERRY"},
+{Id=96349817794138,Name="XXXX"},
+{Id=105433463687285,Name="Alam mo ba girl Hev Abi"},
+{Id=78338689906576,Name="Marikit Sa Dilim"},
+{Id=80186643942739,Name="Kung Ako Sayo"},
+{Id=116809617492226,Name="6lock"},
+{Id=105849669299967,Name="Walang Pag-Ibig"},
+{Id=72274745745781,Name="Pagsamo"},
+{Id=82410487906541,Name="Bakit Nga Ba Mahal Kita"},
+{Id=1188403994693034,Name="Masaya Ka Sa Iba"},
+{Id=79311041168107,Name="Oksihina"},
+{Id=118668717534464,Name="Multo"},
+{Id=119536408246566,Name="Eroplanong Papel"},
+{Id=104973165878865,Name="Bulong"},
+{Id=104293367124017,Name="Kundiman"},
+{Id=81413378667534,Name="Kung Wala Ka"},
+{Id=116237878392921,Name="Bumalik Kana Sakin"},
+{Id=99019663546064,Name="Rebound"},
+{Id=120403965756395,Name="Nasa Puso Ka Parin"},
+{Id=86777554622462,Name="Magkaiba"},
+{Id=106174792478284,Name="Love attack"},
+{Id=75822084529419,Name="Alipin"},
+{Id=129046939580756,Name="The Woman Who Can't Be Moved"}
+}
+
+local musicSound=Instance.new("Sound")
+musicSound.Parent=game.Players.LocalPlayer:WaitForChild("PlayerGui")
+musicSound.Volume=100
+musicSound.Looped=false
+
+local function playSong(id)
+if musicSound.IsPlaying then
+musicSound:Stop()
+end
+musicSound.SoundId="rbxassetid://"..id
+musicSound:Play()
+end
+
+for _,s in ipairs(songs) do
+Music:AddButton(s.Name, function()
+playSong(s.Id)
+end)
+end
+
+Music:AddButton("STOP MUSIC", function()
+if musicSound.IsPlaying then
+musicSound:Stop()
+end
+end)
